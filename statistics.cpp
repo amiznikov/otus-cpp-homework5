@@ -68,7 +68,7 @@ public:
 	}
 
 	double eval() const override {
-		return amount / numb;
+		return amount < 1 ? amount : amount / numb;
 	}
 
 	const char * name() const override {
@@ -77,7 +77,7 @@ public:
 
 private:
 	double amount;
-	double numb;
+	unsigned char numb;
 };
 
 class STD : public IStatistics {
@@ -95,7 +95,7 @@ public:
 
 			sum += pow(abs(value - mean), 2);
 		}
-		return sum / m_values.size();
+		return sum < 1 ? sum : sum / m_values.size();
 	}
 
 	const char * name() const override {
@@ -114,9 +114,10 @@ public:
 	void update(double next) override {
 		m_values.push_back(next);
 		//т.к в eval нельзя менять состояние объекта, то приходится костылить так
-		std::sort(m_values.begin(), m_values.end());
+
 	}
 	double eval() const override {
+		std::sort(m_values.begin(), m_values.end());
 		const double position = (m_values.size() - 1) * m_percentile / 100;
 		const int lowerIndex = static_cast<int>(floor(position));
 		const int upperIndex = static_cast<int>(ceil(position));
@@ -128,7 +129,7 @@ public:
 	}
 private:
 	unsigned char m_percentile;
-	std::vector<double> m_values;
+	mutable std::vector<double> m_values;
 	std::string m_name;
 };
 
@@ -138,9 +139,8 @@ int main() {
 
 	statistics[0] = new Min{};
 	statistics[1] = new Max{};
-	Mean mean;
-	statistics[2] = &mean;
-	statistics[3] = new STD(mean);
+	statistics[2] = new Mean();
+	statistics[3] = new STD(*dynamic_cast<Mean*>(statistics[2]));
 	statistics[4] = new Percentile{90};
 	statistics[5] = new Percentile{95};
 
@@ -164,7 +164,7 @@ int main() {
 	}
 
 	// Clear memory - delete all objects created by new
-	for (size_t i = statistics_count; i > 1; --i) {
+	for (size_t i = statistics_count - 1; i >= 0; --i) {
 		delete statistics[i];
 	}
 
