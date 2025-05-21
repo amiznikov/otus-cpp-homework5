@@ -163,7 +163,7 @@ int main() {
 	}
 
 	// Clear memory - delete all objects created by new
-	for (int i = statistics_count - 1; i >= 0; i--) {
+	for (size_t i = 0; i < statistics_count; ++i) {
 		delete statistics[i];
 	}
 
