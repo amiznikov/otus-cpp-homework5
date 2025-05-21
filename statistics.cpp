@@ -1,4 +1,3 @@
-#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <vector>
@@ -68,7 +67,7 @@ public:
 	}
 
 	double eval() const override {
-		return amount < 1 ? amount : amount / numb;
+		return numb == 0 ? 0 : amount / numb;
 	}
 
 	const char * name() const override {
@@ -76,8 +75,8 @@ public:
 	}
 
 private:
-	double amount;
-	unsigned char numb;
+	double amount{0};
+	size_t numb{0};
 };
 
 class STD : public IStatistics {
@@ -95,7 +94,7 @@ public:
 
 			sum += pow(abs(value - mean), 2);
 		}
-		return sum < 1 ? sum : sum / m_values.size();
+		return  m_values.size()  == 0 ? 0 : sum / m_values.size();
 	}
 
 	const char * name() const override {
@@ -128,7 +127,7 @@ public:
 		return m_name.c_str();
 	}
 private:
-	unsigned char m_percentile;
+	unsigned char m_percentile{0};
 	mutable std::vector<double> m_values;
 	std::string m_name;
 };
@@ -164,7 +163,7 @@ int main() {
 	}
 
 	// Clear memory - delete all objects created by new
-	for (size_t i = statistics_count - 1; i >= 0; --i) {
+	for (int i = statistics_count - 1; i >= 0; i--) {
 		delete statistics[i];
 	}
 
